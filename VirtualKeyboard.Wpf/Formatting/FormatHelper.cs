@@ -6,8 +6,7 @@ namespace VirtualKeyboard.Wpf
     {
         private static readonly Regex _regexDecimal = new Regex("^(-|\\+)?[0-9]*\\.?[0-9]*$");
         private static readonly Regex _regexInteger = new Regex("^(-|\\+)?[0-9]*$");
-        // TODO: expand alphanumeric regex
-        private static readonly Regex _regexAlphanumeric = new Regex("^[a-zA-Z\\.\\-\\+@]*$");
+        private static readonly Regex _regexAlphanumeric = new Regex("^[a-zA-Z.\\-+@0-9\"!#$%\\/&*( )';:,_?]*$");
 
         public static Regex GetRegex(this Format format)
         {
