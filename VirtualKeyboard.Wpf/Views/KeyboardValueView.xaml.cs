@@ -29,33 +29,43 @@ namespace VirtualKeyboard.Wpf.Views
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
-            if(e.Key == Key.Delete || e.Key == Key.Back) return;
             if (this.DataContext is VirtualKeyboardViewModel vm)
             {
-                e.Handled = true;
+                if (e.Key == Key.Back)
+                {
+                    vm.RemoveCharacter.Execute(null);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Key == Key.Delete)
+                {
+                    var oldCaretPosition = vm.CaretPosition;
+                    vm.CaretPosition++;
+                    if (oldCaretPosition != vm.CaretPosition)
+                    {
+                        vm.RemoveCharacter.Execute(null);
+                    }
+                    e.Handled = true;
+                    return;
+                }
+
                 if (e.Key == Key.Escape && vm.ShowDiscardButton)
                 {
                     vm.Discard.Execute(null);
+                    e.Handled = true;
                     return;
                 }
 
                 if (e.Key == Key.Enter)
                 {
                     vm.Accept.Execute(null);
+                    e.Handled = true;
                     return;
                 }
 
-                if (e.Key == Key.Left)
-                {
-                    vm.CaretPosition--;
+                if(!e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.None))
                     return;
-                }
-
-                if (e.Key == Key.Right)
-                {
-                    vm.CaretPosition++;
-                    return;
-                }
 
                 var charString = User32.GetCharFromKey(e.Key)?.ToString();
                 if (charString != null)
@@ -66,9 +76,10 @@ namespace VirtualKeyboard.Wpf.Views
                     }
                     else
                     {
-                        if(vm.Regex.IsMatch(TextBox.Text + charString))
+                        if(vm.Regex.IsMatch(TextBox.TextValue + charString))
                             vm.AddCharacter.Execute(charString);
                     }
+                    e.Handled = true;
                 }
             }
         }

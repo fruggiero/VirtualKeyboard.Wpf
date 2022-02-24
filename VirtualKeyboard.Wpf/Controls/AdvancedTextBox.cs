@@ -63,8 +63,25 @@ namespace VirtualKeyboard.Wpf.Controls
         public AdvancedTextBox()
         {
             SelectionChanged += AdvancedTextBox_SelectionChanged;
-            TextChanged += (s, e) => SetValue(TextValueProperty, Text);
+            TextChanged += AdvancedTextBox_OnTextChanged;
             Loaded += (s, e) => Focus();
+            CommandManager.AddPreviewExecutedHandler(this, PreviewExecuted);
+        }
+
+        private void PreviewExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Command == ApplicationCommands.Copy ||
+                e.Command == ApplicationCommands.Cut  || 
+                e.Command == ApplicationCommands.Paste)
+            {
+                if(PasswordChar != null) e.Handled = true;
+            }
+        }
+
+        private static void AdvancedTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = (AdvancedTextBox)sender;
+            textBox.SetValue(TextValueProperty, textBox.Text);
         }
 
         private void AdvancedTextBox_SelectionChanged(object sender, RoutedEventArgs e)
@@ -90,7 +107,9 @@ namespace VirtualKeyboard.Wpf.Controls
             var s = (AdvancedTextBox)sender;
             int caretPosition = s.CaretPosition;
             string value = e.NewValue as string;
+            s.TextChanged -= AdvancedTextBox_OnTextChanged;
             s.Text = s.PasswordChar != null ? string.Join(string.Empty, Enumerable.Repeat(s.PasswordChar, value.Length)) : value;
+            s.TextChanged += AdvancedTextBox_OnTextChanged;
             s.CaretIndex = caretPosition <= value.Length ? caretPosition : value.Length;
         }
     }
