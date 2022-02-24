@@ -61,6 +61,7 @@
     <Compile Include="Formatting\FormatHelper.cs" />
     <Compile Include="Types\KeyboardType.cs" />
     <Compile Include="Types\UppercaseMode.cs" />
+    <Compile Include="User32.cs" />
     <Compile Include="ViewModels\VirtualKeyboardViewModel.cs" />
     <Compile Include="Views\AlphabetView.xaml.cs">
       <DependentUpon>AlphabetView.xaml</DependentUpon>
