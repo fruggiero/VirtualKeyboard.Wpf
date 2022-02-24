@@ -44,6 +44,19 @@ namespace VirtualKeyboard.Wpf.Views
                     vm.Accept.Execute(null);
                     return;
                 }
+
+                if (e.Key == Key.Left)
+                {
+                    vm.CaretPosition--;
+                    return;
+                }
+
+                if (e.Key == Key.Right)
+                {
+                    vm.CaretPosition++;
+                    return;
+                }
+
                 var charString = User32.GetCharFromKey(e.Key)?.ToString();
                 if (charString != null)
                 {
