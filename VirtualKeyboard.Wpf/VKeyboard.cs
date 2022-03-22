@@ -70,12 +70,16 @@ namespace VirtualKeyboard.Wpf
                     value = await OpenAsync(initValue, type, passwordChar:passwordChar);
                 }
 
+                if (value != null) prop.SetValue(s, value, null);
+
                 if (inputElement != null)
                 {
                     inputElement.Focusable = oldFocusable;
+                    if (oldFocusable)
+                    {
+                        inputElement.Focus();
+                    }
                 }
-
-                if (value != null) prop.SetValue(s, value, null);
             }));
         }
 
