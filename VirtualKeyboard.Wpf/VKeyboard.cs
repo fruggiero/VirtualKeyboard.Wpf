@@ -20,7 +20,7 @@ namespace VirtualKeyboard.Wpf
 
         private static Type _hostType = typeof(DefaultKeyboardHost);
 
-        private static TaskCompletionSource<string> _tcs;
+        private static TaskCompletionSource<Result> _tcs;
         private static Window _windowHost;
 
         public static bool ShowDiscardButton { get; set; }
@@ -37,6 +37,7 @@ namespace VirtualKeyboard.Wpf
             {
                 if (s is AdvancedTextBox) return;
 
+                // Check if element is a focusable
                 IInputElement inputElement = s as IInputElement;
                 bool oldFocusable = false;
                 if (inputElement != null)
@@ -54,24 +55,49 @@ namespace VirtualKeyboard.Wpf
                 Types.KeyboardType type = kind == null ? Types.KeyboardType.Alphabet : (Types.KeyboardType)kind;
                 var format = ((DependencyObject)s).GetValue(FormatBehavior.FormatProperty);
                 var regex = ((DependencyObject)s).GetValue(FormatBehavior.RegexProperty);
-                string value;
+                Result value;
                 char? passwordChar = null;
                 if (s is PasswordBox p) passwordChar = p.PasswordChar;
                 if (regex != null)
                 {
-                    value = await OpenAsync(initValue, type, (string)regex, passwordChar:passwordChar);
+                    value = await OpenAsyncInternal(initValue, type, (string)regex, passwordChar:passwordChar);
                 }
                 else if (format != null)
                 {
-                    value = await OpenAsync(initValue, type, format:(Format)format, passwordChar:passwordChar);
+                    value = await OpenAsyncInternal(initValue, type, format:(Format)format, passwordChar:passwordChar);
                 }
                 else
                 {
-                    value = await OpenAsync(initValue, type, passwordChar:passwordChar);
+                    value = await OpenAsyncInternal(initValue, type, passwordChar:passwordChar);
                 }
 
-                if (value != null) prop.SetValue(s, value, null);
+                if (value != null)
+                {
+                    if (inputElement != null)
+                    {
+                        // Clear text
+                        prop.SetValue(s, string.Empty, null);
 
+                        // Raise text input events
+                        TextCompositionManager.StartComposition(new TextComposition(InputManager.Current, inputElement,
+                            value.KeyboardText));
+                    }
+                    else
+                    {
+                        // Set text
+                        prop.SetValue(s, value.KeyboardText, null);
+                    }
+
+                    // Set caret index
+                    switch (s)
+                    {
+                        case TextBox txt:
+                            txt.CaretIndex = value.CaretPosition;
+                            break;
+                    }
+                }
+
+                // Set focus
                 if (inputElement != null)
                 {
                     inputElement.Focusable = oldFocusable;
@@ -83,15 +109,15 @@ namespace VirtualKeyboard.Wpf
             }));
         }
 
-        public static Task<string> OpenAsync(string initialValue = "", 
-            Types.KeyboardType type = Types.KeyboardType.Alphabet, 
-            string regex = null, 
-            Format? format = null, 
+        private static Task<Result> OpenAsyncInternal(string initialValue = "",
+            Types.KeyboardType type = Types.KeyboardType.Alphabet,
+            string regex = null,
+            Format? format = null,
             char? passwordChar = null)
         {
             if (_windowHost != null) throw new InvalidOperationException();
 
-            _tcs = new TaskCompletionSource<string>();
+            _tcs = new TaskCompletionSource<Result>();
             _windowHost = (Window)Activator.CreateInstance(_hostType);
             var viewModel = new VirtualKeyboardViewModel(initialValue, type, regex, format)
             {
@@ -130,6 +156,16 @@ namespace VirtualKeyboard.Wpf
             return _tcs.Task;
         }
 
+        public static async Task<string> OpenAsync(string initialValue = "", 
+            Types.KeyboardType type = Types.KeyboardType.Alphabet, 
+            string regex = null, 
+            Format? format = null, 
+            char? passwordChar = null)
+        {
+            var res = await OpenAsyncInternal(initialValue, type, regex, format, passwordChar);
+            return res.KeyboardText;
+        }
+
         public static void Close()
         {
             if (_windowHost == null) throw new InvalidOperationException();
@@ -143,10 +179,22 @@ namespace VirtualKeyboard.Wpf
             return viewModel.Accepted;
         }
 
-        private static string GetResult()
+        private static Result GetResult()
         {
             var viewModel = (VirtualKeyboardViewModel)_windowHost.DataContext;
-            return viewModel.KeyboardText;
+            return new Result(viewModel.KeyboardText, viewModel.CaretPosition);
+        }
+
+        private class Result
+        {
+            public string KeyboardText { get; }
+            public int CaretPosition { get; }
+
+            public Result(string text, int pos)
+            {
+                KeyboardText = text;
+                CaretPosition = pos;
+            }
         }
     }
 }
