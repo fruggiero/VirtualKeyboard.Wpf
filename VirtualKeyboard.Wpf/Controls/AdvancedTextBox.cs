@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace VirtualKeyboard.Wpf.Controls
 {
@@ -64,7 +65,13 @@ namespace VirtualKeyboard.Wpf.Controls
         {
             SelectionChanged += AdvancedTextBox_SelectionChanged;
             TextChanged += AdvancedTextBox_OnTextChanged;
-            Loaded += (s, e) => Focus();
+            Loaded += (s, e) =>
+            {
+                Dispatcher.BeginInvoke(DispatcherPriority.Input,
+                    new Action(delegate() { 
+                        Focus();
+                    }));
+            };
             CommandManager.AddPreviewExecutedHandler(this, PreviewExecuted);
         }
 
