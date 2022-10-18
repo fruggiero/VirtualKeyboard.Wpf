@@ -91,16 +91,28 @@ namespace VirtualKeyboard.Wpf.Controls
             textBox.SetValue(TextValueProperty, textBox.Text);
         }
 
-        private void AdvancedTextBox_SelectionChanged(object sender, RoutedEventArgs e)
+        private static void AdvancedTextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
-            SetValue(CaretPositionProperty, CaretIndex);
-            SetValue(SelectedValueProperty, SelectedText);
+            var s = (AdvancedTextBox)sender;
+            s.SelectionChanged -= AdvancedTextBox_SelectionChanged;
+            var oldSelectionLength = s.SelectionLength;
+            var oldSelectionStart = s.SelectionStart;
+
+            s.SetValue(SelectedValueProperty, s.SelectedText);
+            s.SetValue(CaretPositionProperty, s.CaretIndex);
+
+            s.SelectionStart = oldSelectionStart;
+            s.SelectionLength = oldSelectionLength;
+            s.SelectionChanged += AdvancedTextBox_SelectionChanged;
         }
 
         private static void OnCaretPositionChange(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             int? value = e.NewValue as int?;
+            var s = (AdvancedTextBox)sender;
+            s.SelectionChanged -= AdvancedTextBox_SelectionChanged;
             ((TextBox)sender).CaretIndex = value ?? 0;
+            s.SelectionChanged += AdvancedTextBox_SelectionChanged;
         }
 
         private static void OnSelectedTextChange(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -114,10 +126,12 @@ namespace VirtualKeyboard.Wpf.Controls
             var s = (AdvancedTextBox)sender;
             int caretPosition = s.CaretPosition;
             string value = e.NewValue as string;
+            s.SelectionChanged -= AdvancedTextBox_SelectionChanged;
             s.TextChanged -= AdvancedTextBox_OnTextChanged;
             s.Text = s.PasswordChar != null ? string.Join(string.Empty, Enumerable.Repeat(s.PasswordChar, value.Length)) : value;
             s.TextChanged += AdvancedTextBox_OnTextChanged;
             s.CaretIndex = caretPosition <= value.Length ? caretPosition : value.Length;
+            s.SelectionChanged += AdvancedTextBox_SelectionChanged;
         }
     }
 }
