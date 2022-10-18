@@ -56,19 +56,31 @@ namespace VirtualKeyboard.Wpf
                 var format = ((DependencyObject)s).GetValue(FormatBehavior.FormatProperty);
                 var regex = ((DependencyObject)s).GetValue(FormatBehavior.RegexProperty);
                 Result value;
+
+                // Set passwordChar
                 char? passwordChar = null;
                 if (s is PasswordBox p) passwordChar = p.PasswordChar;
+                
+                // Set caret index
+                int? caretIndex = null;
+                switch (s)
+                {
+                    case TextBox txt:
+                        caretIndex = txt.CaretIndex;
+                        break;
+                }
+
                 if (regex != null)
                 {
-                    value = await OpenAsyncInternal(initValue, type, (string)regex, passwordChar:passwordChar);
+                    value = await OpenAsyncInternal(initValue, caretIndex, type, (string)regex, passwordChar:passwordChar);
                 }
                 else if (format != null)
                 {
-                    value = await OpenAsyncInternal(initValue, type, format:(Format)format, passwordChar:passwordChar);
+                    value = await OpenAsyncInternal(initValue, caretIndex, type, format:(Format)format, passwordChar:passwordChar);
                 }
                 else
                 {
-                    value = await OpenAsyncInternal(initValue, type, passwordChar:passwordChar);
+                    value = await OpenAsyncInternal(initValue, caretIndex, type, passwordChar:passwordChar);
                 }
 
                 if (value != null)
@@ -109,6 +121,7 @@ namespace VirtualKeyboard.Wpf
         }
 
         private static Task<Result> OpenAsyncInternal(string initialValue = "",
+            int? caretIndex = null,
             Types.KeyboardType type = Types.KeyboardType.Alphabet,
             string regex = null,
             Format? format = null,
@@ -118,10 +131,11 @@ namespace VirtualKeyboard.Wpf
 
             _tcs = new TaskCompletionSource<Result>();
             _windowHost = (Window)Activator.CreateInstance(_hostType);
-            var viewModel = new VirtualKeyboardViewModel(initialValue, type, regex, format)
+            var viewModel = new VirtualKeyboardViewModel(initialValue, type, caretIndex, regex, format)
             {
                 ShowDiscardButton = ShowDiscardButton
             };
+
             _windowHost.DataContext = viewModel;
             var keyboardValueView = new KeyboardValueView();
             ((ContentControl)_windowHost.FindName(_keyboardValueName)).Content = keyboardValueView;
@@ -156,12 +170,13 @@ namespace VirtualKeyboard.Wpf
         }
 
         public static async Task<string> OpenAsync(string initialValue = "", 
+            int? caretIndex = null,
             Types.KeyboardType type = Types.KeyboardType.Alphabet, 
             string regex = null, 
             Format? format = null, 
             char? passwordChar = null)
         {
-            var res = await OpenAsyncInternal(initialValue, type, regex, format, passwordChar);
+            var res = await OpenAsyncInternal(initialValue, caretIndex, type, regex, format, passwordChar);
             return res.KeyboardText;
         }
 

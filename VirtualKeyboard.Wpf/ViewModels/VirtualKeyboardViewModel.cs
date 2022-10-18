@@ -78,7 +78,7 @@ namespace VirtualKeyboard.Wpf.ViewModels
         public Command Accept { get; }
         public Command Discard { get; }
 
-        public VirtualKeyboardViewModel(string initialValue, KeyboardType type, string regex = null, Format? format = null)
+        public VirtualKeyboardViewModel(string initialValue, KeyboardType type, int? caretIndex = null, string regex = null, Format? format = null)
         {
             _keyboardText = initialValue;
             _keyboardType = type;
@@ -101,7 +101,7 @@ namespace VirtualKeyboard.Wpf.ViewModels
                 }
             }
             _uppercase = false;
-            CaretPosition = _keyboardText.Length;
+            CaretPosition = caretIndex ?? _keyboardText.Length;
             AddCharacter = new Command(a =>
             {
                 if (!(a is string character) || character.Length != 1) return;
