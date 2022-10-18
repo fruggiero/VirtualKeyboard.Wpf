@@ -75,18 +75,17 @@ namespace VirtualKeyboard.Wpf
                 {
                     if (inputElement != null)
                     {
-                        // Clear text
-                        prop.SetValue(s, string.Empty, null);
+                        var txtArgs = new TextCompositionEventArgs(
+                            Keyboard.PrimaryDevice,
+                            new TextComposition(InputManager.Current, inputElement, value.KeyboardText))
+                        {
+                            RoutedEvent = UIElement.PreviewTextInputEvent,
+                            Source = inputElement
+                        };
+                        inputElement.RaiseEvent(txtArgs);
+                    }
 
-                        // Raise text input events
-                        TextCompositionManager.StartComposition(new TextComposition(InputManager.Current, inputElement,
-                            value.KeyboardText));
-                    }
-                    else
-                    {
-                        // Set text
-                        prop.SetValue(s, value.KeyboardText, null);
-                    }
+                    prop.SetValue(s, value.KeyboardText, null);
 
                     // Set caret index
                     switch (s)
