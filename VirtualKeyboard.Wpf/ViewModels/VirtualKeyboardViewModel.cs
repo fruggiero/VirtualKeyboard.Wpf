@@ -1,10 +1,11 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 using VirtualKeyboard.Wpf.Types;
 
 namespace VirtualKeyboard.Wpf.ViewModels
 {
-    class VirtualKeyboardViewModel : INotifyPropertyChanged
+    internal class VirtualKeyboardViewModel : INotifyPropertyChanged
     {
         public Regex Regex { get; }
 
@@ -82,13 +83,15 @@ namespace VirtualKeyboard.Wpf.ViewModels
         {
             _keyboardText = initialValue;
             _keyboardType = type;
-            Regex = regex == null ? null : new Regex(regex);
-            if (Regex == null && format != null)
+            if (regex != null)
+            {
+                Regex = new Regex(regex);
+            }
+            else if (format != null)
             {
                 Regex = format.Value.GetRegex();
             }
-
-            if (Regex == null)
+            else
             {
                 switch (_keyboardType)
                 {
@@ -100,6 +103,7 @@ namespace VirtualKeyboard.Wpf.ViewModels
                         break;
                 }
             }
+
             _uppercase = false;
             CaretPosition = caretIndex ?? _keyboardText.Length;
             AddCharacter = new Command(a =>
@@ -148,8 +152,7 @@ namespace VirtualKeyboard.Wpf.ViewModels
             });
             ChangeKeyboardType = new Command(a =>
             {
-                if (KeyboardType == KeyboardType.Alphabet) KeyboardType = KeyboardType.Special;
-                else KeyboardType = KeyboardType.Alphabet;
+                KeyboardType = KeyboardType == KeyboardType.Alphabet ? KeyboardType.Special : KeyboardType.Alphabet;
             });
             Accept = new Command(a =>
             {
@@ -165,7 +168,7 @@ namespace VirtualKeyboard.Wpf.ViewModels
 
         private string RemoveSubstring(string substring)
         {
-            var position = KeyboardText.IndexOf(substring);
+            var position = KeyboardText.IndexOf(substring, StringComparison.Ordinal);
             return KeyboardText.Remove(position, substring.Length);
         }
 

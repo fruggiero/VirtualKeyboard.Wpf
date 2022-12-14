@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -15,6 +16,9 @@ namespace VirtualKeyboard.Wpf
 {
     public static class VKeyboard
     {
+        private static CultureInfo _culture = CultureInfo.CurrentCulture;
+        private static readonly PropertyChangedEventArgs _culturePropertyEventArgs = new PropertyChangedEventArgs (nameof(Culture));
+        private static readonly PropertyChangedEventArgs _decimalSeparatorPropertyEventArgs = new PropertyChangedEventArgs (nameof(DecimalSeparator));
         private const string _keyboardValueName = "KeyboardValueContent";
         private const string _keyboardName = "KeyboardContent";
 
@@ -24,6 +28,21 @@ namespace VirtualKeyboard.Wpf
         private static Window _windowHost;
 
         public static bool ShowDiscardButton { get; set; }
+        
+        public static event PropertyChangedEventHandler StaticPropertyChanged;
+
+        public static string DecimalSeparator => Culture?.NumberFormat?.NumberDecimalSeparator ?? ".";
+
+        public static CultureInfo Culture
+        {
+            get => _culture;
+            set
+            {
+                _culture = value;
+                StaticPropertyChanged?.Invoke(null, _culturePropertyEventArgs);
+                StaticPropertyChanged?.Invoke(null, _decimalSeparatorPropertyEventArgs);
+            }
+        }
 
         public static void Config(Type hostType)
         {
