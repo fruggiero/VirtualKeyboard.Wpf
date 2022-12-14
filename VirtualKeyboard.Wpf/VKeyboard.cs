@@ -177,6 +177,8 @@ namespace VirtualKeyboard.Wpf
             char? passwordChar = null)
         {
             var res = await OpenAsyncInternal(initialValue, caretIndex, type, regex, format, passwordChar);
+            if (res == null)
+                return await Task.FromResult<string>(null);
             return res.KeyboardText;
         }
 
