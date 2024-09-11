@@ -98,9 +98,6 @@ namespace VirtualKeyboard.Wpf.ViewModels
                     case KeyboardType.NumericOnly:
                         Regex = Format.Decimal.GetRegex();
                         break;
-                    case KeyboardType.Alphabet:
-                        Regex = Format.Alphanumeric.GetRegex();
-                        break;
                 }
             }
 

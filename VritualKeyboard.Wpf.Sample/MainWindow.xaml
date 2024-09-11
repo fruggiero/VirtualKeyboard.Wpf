@@ -27,6 +27,11 @@
         <TextBox Margin="20" Height="40" Width="150" />
 
         <TextBlock Margin="20" Height="40" Width="150" TextWrapping="WrapWithOverflow">
+            Alphanumeric Format
+        </TextBlock>
+        <TextBox Margin="20" Height="40" Width="150" keyboardBehaviors:FormatBehavior.Format="Alphanumeric" />
+
+        <TextBlock Margin="20" Height="40" Width="150" TextWrapping="WrapWithOverflow">
             Password box
         </TextBlock>
         <PasswordBox Margin="20" Height="40" Width="150" PasswordChar="*"  />
