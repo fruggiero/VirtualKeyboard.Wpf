@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace VirtualKeyboard.Wpf
 {
-    class Command : ICommand
+    internal class Command : ICommand
     {
         public event EventHandler CanExecuteChanged;
 
@@ -18,7 +14,7 @@ namespace VirtualKeyboard.Wpf
             set
             {
                 _canExecuteCommand = value;
-                CanExecuteChanged?.Invoke(this, new EventArgs());
+                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 

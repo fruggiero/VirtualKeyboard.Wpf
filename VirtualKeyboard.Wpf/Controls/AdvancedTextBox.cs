@@ -1,22 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace VirtualKeyboard.Wpf.Controls
 {
-    class AdvancedTextBox : TextBox
+    internal class AdvancedTextBox : TextBox
     {
         public char? PasswordChar
         {
@@ -30,8 +21,8 @@ namespace VirtualKeyboard.Wpf.Controls
 
         public int CaretPosition
         {
-            get { return (int)GetValue(CaretPositionProperty); }
-            set { SetValue(CaretPositionProperty, value); }
+            get => (int)GetValue(CaretPositionProperty);
+            set => SetValue(CaretPositionProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for CaretPosition.  This enables animation, styling, binding, etc...
@@ -41,8 +32,8 @@ namespace VirtualKeyboard.Wpf.Controls
 
         public string SelectedValue
         {
-            get { return (string)GetValue(SelectedValueProperty); }
-            set { SetValue(SelectedValueProperty, value); }
+            get => (string)GetValue(SelectedValueProperty);
+            set => SetValue(SelectedValueProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for SelectedValue.  This enables animation, styling, binding, etc...
@@ -52,8 +43,8 @@ namespace VirtualKeyboard.Wpf.Controls
 
         public string TextValue
         {
-            get { return (string)GetValue(TextValueProperty); }
-            set { SetValue(TextValueProperty, value); }
+            get => (string)GetValue(TextValueProperty);
+            set => SetValue(TextValueProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for TextValue.  This enables animation, styling, binding, etc...
