@@ -28,6 +28,12 @@ VKeyboard.Listen<TextBox>(e => e.Text);
 Now every time you click on any TextBox - keyboard dialog will showup with default value of Text property, and will automatically assign new value.
 ** Hint ** You can combine it with checking for touch devices, so it will only listen when there is an available touch device.
 
+## Custom culture settings
+
+The keyboard will defaults to [CultureInfo.CurrentCulture](https://learn.microsoft.com/it-it/dotnet/api/system.globalization.cultureinfo.currentculture?view=net-7.0).
+
+In order to use other culture settings, you can set the `Culture` property on the static `VKeyboard` class
+
 ## Custom styling
 You can create your own style resource file and add it instead of a default one.
 Additionaly you can specify your own Keyboard host window. Just create a new window with two ** ContentControl **controls - similar to DefaultKeyboardHost:
